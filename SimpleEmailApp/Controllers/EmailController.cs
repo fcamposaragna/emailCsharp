@@ -11,21 +11,15 @@ namespace SimpleEmailApp.Controllers
     [ApiController]
     public class EmailController : ControllerBase
     {
-        [HttpPost]
-        public IActionResult SendEmail(string body)
+        private readonly IEmailService _emailService;
+        public EmailController(IEmailService emailService)
         {
-            var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse("sydnie.harber@ethereal.email"));
-            email.To.Add(MailboxAddress.Parse("sydnie.harber@ethereal.email"));
-            email.Subject = "Test mail";
-            email.Body = new TextPart(TextFormat.Html) { Text = body };
-
-            using var smpt = new SmtpClient();
-            smpt.Connect("smtp.ethereal.email", 587, SecureSocketOptions.StartTls);
-            smpt.Authenticate("sydnie.harber@ethereal.email", "FzqK9jtwww1CA14DtH");
-            smpt.Send(email);
-            smpt.Disconnect(true);
-
+            _emailService = emailService;
+        }
+        [HttpPost]
+        public IActionResult SendEmail(EmailDTO request)
+        {
+            _emailService.SendEmail(request);
             return Ok();
         }
     }
